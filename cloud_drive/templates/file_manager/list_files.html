@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Files and Folders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .file-list {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+        }
+        .file-name {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="file-list">
+        <h2>Your Files and Folders</h2>
+        <ul>
+            {% for file in files %}
+            <li>
+                <div class="file-info">
+                    <span class="file-name">{{ file.file.name }}</span>
+                    <span class="file-date">Uploaded on: {{ file.uploaded_at }}</span>
+                </div>
+            </li>
+            {% empty %}
+            <li>No files uploaded yet.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Create a New Folder</h3>
+        <a href="{% url 'create_folder' %}">Create a Folder</a>
+    </div>
+</body>
+</html>
