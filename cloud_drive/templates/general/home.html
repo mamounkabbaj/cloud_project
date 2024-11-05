@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Welcome to Cloudly{% endblock %}</title>
+
+    <!-- Bulma CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom inline styles for minimal page design -->
+    <style>
+        /* Applying the custom gradient background for the page */
+        body {
+            background: linear-gradient(135deg, #2667FF 0%, #3F8EFC 50%, #87BFFF 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Centering the main content */
+        .content-wrapper {
+            text-align: center;
+        }
+
+        .button.is-large {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content-wrapper">
+        <h1 class="title is-1">Welcome to Cloudly</h1>
+        <p>Your secure and easy-to-use cloud storage solution.</p>
+
+        <!-- Get Started and Login Buttons -->
+        <div class="buttons is-centered">
+            <a href="/register/" class="button is-info is-large">
+                <span class="icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </span>
+                <span>Get Started</span>
+            </a>
+            <a href="/login/" class="button is-success is-large">
+                <span class="icon">
+                    <i class="fas fa-sign-in-alt"></i>
+                </span>
+                <span>Login</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

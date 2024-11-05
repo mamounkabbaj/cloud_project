@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Home - Cloudly</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #2667FF 0%, #87BFFF 100%);
+            color: white;
+            margin: 0;
+        }
+        .section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+        .container {
+            width: 100%;
+        }
+        h1.title {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .card {
+            background-color: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        h2, h3 {
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Welcome to Your Cloudly Home</h1>
+
+            <div class="columns">
+                <!-- Upload Files Card -->
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <span class="icon is-large">
+                                <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                            </span>
+                            <h3 class="title is-4">Upload Files</h3>
+                            <a href="{% url 'upload_file' %}" class="button is-info">Upload Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Browse Files Card -->
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <span class="icon is-large">
+                                <i class="fas fa-folder-open fa-3x"></i>
+                            </span>
+                            <h3 class="title is-4">Browse Files</h3>
+                            <a href="{% url 'list_files' %}" class="button is-success">View Files</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Card -->
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <span class="icon is-large">
+                                <i class="fas fa-chart-line fa-3x"></i>
+                            </span>
+                            <h3 class="title is-4">Dashboard</h3>
+                            <a href="{% url 'file_type_breakdown' %}" class="button is-warning">View Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

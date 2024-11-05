@@ -3,58 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Files and Folders</title>
+    <title>Files and Folders - Cloudly</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 50px;
+        .file-manager-section {
+            margin: 2rem;
         }
-        .file-list {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            padding: 10px;
+        .file-item, .folder-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
             border-bottom: 1px solid #ddd;
         }
-        li:last-child {
-            border-bottom: none;
+        .file-item .icon, .folder-item .icon {
+            margin-right: 1rem;
         }
-        .file-info {
-            display: flex;
-            justify-content: space-between;
-        }
-        .file-name {
-            font-weight: bold;
+        .metadata {
+            color: #555;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="file-list">
-        <h2>Your Files and Folders</h2>
-        <ul>
-            {% for file in files %}
-            <li>
-                <div class="file-info">
-                    <span class="file-name">{{ file.file.name }}</span>
-                    <span class="file-date">Uploaded on: {{ file.uploaded_at }}</span>
-                </div>
-            </li>
-            {% empty %}
-            <li>No files uploaded yet.</li>
-            {% endfor %}
-        </ul>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Files and Folders</h1>
+            
+            <!-- Back to User Home Page Button -->
+            <a href="{% url 'user_home' %}" class="button is-light home-button">
+                <span class="icon"><i class="fas fa-home"></i></span>
+                <span>Back to User Home</span>
+            </a>
 
-        <h3>Create a New Folder</h3>
-        <a href="{% url 'create_folder' %}">Create a Folder</a>
-    </div>
+            <!-- Back Button (visible when inside a folder) -->
+            {% if current_folder %}
+            <a href="{% url 'list_files' %}" class="button is-light back-button">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Back to All Folders</span>
+            </a>
+            {% endif %}
+            
+            <!-- Create Folder Form -->
+            <form method="POST" action="{% url 'create_folder' %}" style="margin-bottom: 1rem;">
+                {% csrf_token %}
+                <div class="field">
+                    <label class="label">Create New Folder</label>
+                    <div class="control">
+                        <input type="text" name="folder_name" class="input" placeholder="Folder Name" required>
+                    </div>
+                </div>
+                <button type="submit" class="button is-primary">Create Folder</button>
+            </form>
+
+            <div class="file-manager-section">
+                <!-- Folders -->
+                <h2 class="subtitle">Folders</h2>
+                <div>
+                    {% for folder in folders %}
+                    <div class="folder-item">
+                        <div>
+                            <span class="icon"><i class="fas fa-folder"></i></span>
+                            <a href="{% url 'list_files_in_folder' folder.id %}">{{ folder.name }}</a>
+                        </div>
+                        <div>
+                            <form action="{% url 'delete_folder' folder.id %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="button is-small is-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No folders available.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Move Files Form -->
+                <form method="POST" action="{% url 'move_files_to_folder' %}">
+                    {% csrf_token %}
+
+                    <!-- Files with metadata -->
+                    <h2 class="subtitle mt-4">Files</h2>
+                    <div>
+                        {% for file in files %}
+                        <div class="file-item">
+                            <div>
+                                <input type="checkbox" name="file_ids" value="{{ file.id }}"> <!-- Checkbox for selecting files -->
+                                <span class="icon"><i class="fas fa-file"></i></span>
+                                <span>{{ file.file.name }}</span>
+                                <span class="metadata"> • {{ file.file.size|filesizeformat }} • {{ file.uploaded_at|date:"Y-m-d H:i" }}</span>
+                            </div>
+                            <div>
+                                <a href="{% url 'download_file' file.id %}" class="button is-small is-info">Download</a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No files available.</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Folder dropdown and Move button -->
+                    <div class="field mt-4">
+                        <label class="label">Move selected files to:</label>
+                        <div class="control">
+                            <div class="select">
+                                <select name="target_folder_id" required>
+                                    <option value="">Select a folder</option>
+                                    {% for folder in folders %}
+                                    <option value="{{ folder.id }}">{{ folder.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="button is-primary mt-3">Move</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 </body>
 </html>

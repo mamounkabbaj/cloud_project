@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cloudly</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">File Drive Statistics</h1>
+
+            <!-- File Type Distribution Chart -->
+            <div class="columns">
+                <div class="column">
+                    <h2 class="subtitle">File Type Distribution</h2>
+                    <canvas id="fileTypeChart"></canvas>
+                </div>
+                
+                <!-- Storage Usage Over Time Chart -->
+                <div class="column">
+                    <h2 class="subtitle">Storage Usage Over Time (GB)</h2>
+                    <canvas id="storageUsageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // File Type Data from Django
+        const fileTypeData = JSON.parse('{{ file_type_data|safe }}');
+        const fileTypes = fileTypeData.map(item => item.file_type || "Others");
+        const fileCounts = fileTypeData.map(item => item.count);
+
+        // Storage Usage Data from Django
+        const usageData = JSON.parse('{{ usage_data|safe }}');
+        const usageDates = usageData.map(item => item.date);
+        const usageSizes = usageData.map(item => item.total_size);
+
+        // File Type Chart
+        const fileTypeCtx = document.getElementById('fileTypeChart').getContext('2d');
+        new Chart(fileTypeCtx, {
+            type: 'bar',
+            data: {
+                labels: fileTypes,
+                datasets: [{
+                    label: 'File Count',
+                    data: fileCounts,
+                    backgroundColor: 'rgba(66, 135, 245, 0.7)'
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `Count: ${ctx.raw}` } }
+                }
+            }
+        });
+
+        // Storage Usage Chart
+        const storageUsageCtx = document.getElementById('storageUsageChart').getContext('2d');
+        new Chart(storageUsageCtx, {
+            type: 'line',
+            data: {
+                labels: usageDates,
+                datasets: [{
+                    label: 'Storage Usage (GB)',
+                    data: usageSizes,
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { type: 'time', time: { unit: 'day' } }
+                },
+                plugins: {
+                    tooltip: { callbacks: { label: ctx => `${ctx.raw} GB` } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

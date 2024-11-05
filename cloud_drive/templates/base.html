@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cloudly{% endblock %}</title>
+
+    <!-- Bulma CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        /* Gradient background for the whole page */
+        body {
+            background: linear-gradient(135deg, #2667FF 0%, #3F8EFC 50%, #87BFFF 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .hero-body {
+            text-align: center;
+        }
+        .button.is-info {
+            background-color: #3F8EFC !important;
+            margin-right: 10px;
+        }
+        .button.is-success {
+            background-color: #87BFFF !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Main Content Block -->
+    <section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                {% block content %}
+                <!-- Dynamic content will go here -->
+                {% endblock %}
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
