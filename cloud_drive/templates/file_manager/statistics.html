@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - Cloudly</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Main page background */
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* White content container */
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Title styling */
+        .title, .subtitle {
+            color: #333;
+        }
+
+        /* Back button styling */
+        .back-button {
+            background-color: #2667FF;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Chart container */
+        .chart-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <!-- Back to Home Button -->
+            <a href="{% url 'user_home' %}" class="button back-button">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Back to Home</span>
+            </a>
+
+            <h1 class="title">File Drive Statistics</h1>
+
+            <!-- File Type Distribution Chart -->
+            <div class="chart-container">
+                <h2 class="subtitle">File Type Distribution</h2>
+                <canvas id="fileTypeChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Parse JSON data safely
+        const fileTypeData = JSON.parse('{{ file_type_data|safe }}');
+
+        // Extract data for charts
+        const fileTypes = fileTypeData.map(item => item.file_type || "Others");
+        const fileCounts = fileTypeData.map(item => item.count);
+
+        // File Type Pie Chart
+        const fileTypeCtx = document.getElementById('fileTypeChart').getContext('2d');
+        new Chart(fileTypeCtx, {
+            type: 'pie',
+            data: {
+                labels: fileTypes,
+                datasets: [{
+                    label: 'File Count',
+                    data: fileCounts,
+                    backgroundColor: [
+                        'rgba(66, 135, 245, 0.7)',
+                        'rgba(245, 99, 66, 0.7)',
+                        'rgba(66, 245, 182, 0.7)',
+                        'rgba(245, 245, 66, 0.7)',
+                        'rgba(123, 66, 245, 0.7)',
+                        'rgba(245, 153, 66, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: { callbacks: { label: ctx => `Count: ${ctx.raw}` } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

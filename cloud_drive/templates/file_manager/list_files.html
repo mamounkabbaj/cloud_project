@@ -20,9 +20,9 @@
         .file-item .icon, .folder-item .icon {
             margin-right: 1rem;
         }
-        .metadata {
-            color: #555;
-            font-size: 0.9rem;
+        .back-button, .home-button {
+            margin-bottom: 1rem;
+            margin-right: 0.5rem;
         }
     </style>
 </head>
@@ -83,7 +83,7 @@
                 <form method="POST" action="{% url 'move_files_to_folder' %}">
                     {% csrf_token %}
 
-                    <!-- Files with metadata -->
+                    <!-- Files with checkboxes -->
                     <h2 class="subtitle mt-4">Files</h2>
                     <div>
                         {% for file in files %}
@@ -92,7 +92,6 @@
                                 <input type="checkbox" name="file_ids" value="{{ file.id }}"> <!-- Checkbox for selecting files -->
                                 <span class="icon"><i class="fas fa-file"></i></span>
                                 <span>{{ file.file.name }}</span>
-                                <span class="metadata"> • {{ file.file.size|filesizeformat }} • {{ file.uploaded_at|date:"Y-m-d H:i" }}</span>
                             </div>
                             <div>
                                 <a href="{% url 'download_file' file.id %}" class="button is-small is-info">Download</a>

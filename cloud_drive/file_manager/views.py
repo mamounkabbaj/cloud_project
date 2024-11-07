@@ -11,6 +11,15 @@ from django.db.models.functions import TruncDay
 from collections import Counter
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+from django.db.models import F, ExpressionWrapper, FloatField, DateField
+from django.contrib import messages  # Import messages to show feedback to the user
+from django.db import IntegrityError
+from django.utils.crypto import get_random_string
+from .models import UserFile
+import mimetypes
+
+
+
 
 import os
 import shutil
@@ -24,10 +33,15 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            user_folder = os.path.join(settings.MEDIA_ROOT, user.username)
-            os.makedirs(user_folder, exist_ok=True)
-            return redirect('login')
+            try:
+                user = form.save()
+                user_folder = os.path.join(settings.MEDIA_ROOT, user.username)
+                os.makedirs(user_folder, exist_ok=True)
+                return redirect('login')
+            except IntegrityError:  # Catch the IntegrityError if the username already exists
+                messages.error(request, "This username is already taken. Please choose a different one.")
+                # Re-render the form so the user can try another username
+                form = UserCreationForm()
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -184,9 +198,51 @@ def file_type_breakdown(request):
     return render(request, 'file_manager/dashboard.html', context)
 
 
+'''
+@login_required
+def statistics(request):
+    # Define file type mappings based on extensions
+    file_type_map = {
+        'Documents': ['.pdf', '.doc', '.docx', '.txt'],
+        'Images': ['.jpg', '.jpeg', '.png', '.gif'],
+        'Videos': ['.mp4', '.mov', '.avi', '.mkv'],
+        'Others': []
+    }
+
+    # Initialize counters for file types
+    file_type_counts = Counter()
+    total_size_gb = 0
+    user_files = UserFile.objects.filter(user=request.user)
+
+    # Categorize files and calculate total size
+    for user_file in user_files:
+        ext = os.path.splitext(user_file.file.name)[1].lower()
+        file_type = next((type_name for type_name, extensions in file_type_map.items() if ext in extensions), 'Others')
+        file_type_counts[file_type] += 1
+        if user_file.file:
+            total_size_gb += user_file.file.size / (1024 * 1024 * 1024)  # Convert bytes to GB
+
+    # Prepare data for file type distribution chart
+    file_type_data = [{'file_type': key, 'count': value} for key, value in file_type_counts.items()]
+
+    # Calculate storage usage over the past 30 days
+    usage_data = []
+    for day in range(30, -1, -1):
+        day_date = now() - timedelta(days=day)
+        day_files = user_files.filter(uploaded_at__date=day_date.date())
+        day_total_size = sum(f.file.size for f in day_files if f.file) / (1024 * 1024 * 1024)  # Convert bytes to GB
+        usage_data.append({'date': day_date.strftime('%Y-%m-%d'), 'total_size': day_total_size})
+
+    context = {
+        'file_type_data': json.dumps(file_type_data, cls=DjangoJSONEncoder),
+        'usage_data': json.dumps(usage_data, cls=DjangoJSONEncoder),
+        'total_size_gb': total_size_gb,
+    }
+    return render(request, 'file_manager/statistics.html', context)
+'''
 
 @login_required
-def dashboard(request):
+def statistics(request):
     # Define file type mappings based on extensions
     file_type_map = {
         'Documents': ['.pdf', '.doc', '.docx', '.txt'],
@@ -212,19 +268,25 @@ def dashboard(request):
     file_type_data = [{'file_type': key, 'count': value} for key, value in file_type_counts.items()]
 
     # Prepare data for storage usage over time (last 30 days)
-    usage_data = (
+    usage_data = []
+    date_files_map = (
         user_files
         .filter(uploaded_at__gte=now() - timedelta(days=30))
         .annotate(date=TruncDay('uploaded_at'))
         .values('date')
-        .annotate(total_size=Sum('file__size') / (1024 * 1024 * 1024))  # Size in GB
-        .order_by('date')
     )
-    usage_data = [{'date': item['date'].strftime('%Y-%m-%d'), 'total_size': item['total_size']} for item in usage_data]
+
+    for entry in date_files_map:
+        date = entry['date']
+        date_files = user_files.filter(uploaded_at__date=date)
+        date_total_size = sum(file.file.size for file in date_files if file.file) / (1024 * 1024 * 1024)  # Size in GB
+        usage_data.append({'date': date.strftime('%Y-%m-%d'), 'total_size': date_total_size})
 
     context = {
         'file_type_data': json.dumps(file_type_data, cls=DjangoJSONEncoder),
         'usage_data': json.dumps(usage_data, cls=DjangoJSONEncoder),
         'total_size_gb': total_size_gb,
     }
-    return render(request, 'file_manager/dashboard.html', context)
+    return render(request, 'file_manager/statistics.html', context)
+
+
